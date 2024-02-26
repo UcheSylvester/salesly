@@ -1,0 +1,4 @@
+export enum REPLICACHE_KEYS {
+  COUNTER = 'COUNTER',
+  TODO = 'TODO'
+}
