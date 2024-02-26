@@ -1,36 +1,38 @@
-import { CounterMutators, counterMutators } from "@/features/counter";
+import { CounterMutators, counterMutators } from "@/features/Counter";
+import { InventoryMutators, inventoryMutators } from "@/features/SalesInventory";
 import { PropsWithChildren, createContext, useContext, useEffect, useState } from "react";
 import { Replicache } from "replicache";
 
-export type M = CounterMutators;
+export type M = CounterMutators & InventoryMutators
 
 const ReplicacheContext = createContext<Replicache<M> | null>(
   null
 );
 
 export const ReplicacheProvider = ({children}: PropsWithChildren) => {
-  const [rep, setRep] = useState<Replicache<M> | null>(null)
+  const [r, setR] = useState<Replicache<M> | null>(null)
 
   useEffect(() => {
     if(!process.env.NEXT_PUBLIC_REPLICACHE_LICENSE_KEY) return;
 
-    const rep = new Replicache({
+    const r = new Replicache({
       licenseKey: process.env.NEXT_PUBLIC_REPLICACHE_LICENSE_KEY || '',
       name: `prod-inventory`, // should be unique per user
       mutators: {
-        ...counterMutators
+        ...counterMutators,
+        ...inventoryMutators
       }
     })
 
-    setRep(rep)
+    setR(r)
 
     return () => {
-      rep.close()
+      r.close()
     }
   }, [])
 
   return (
-    <ReplicacheContext.Provider value={rep}>
+    <ReplicacheContext.Provider value={r}>
       {children}
     </ReplicacheContext.Provider>
   );
